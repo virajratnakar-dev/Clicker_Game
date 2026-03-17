@@ -1,11 +1,244 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<title>Chaos Clicker</title>
+
+<style>
+
+/* ================= GLOBAL RESET ================= */
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    transition:all .25s ease;
+}
+
+::selection{
+    background:#00ffff;
+    color:black;
+}
+
+/* ================= BACKGROUND ================= */
+body{
+    padding:30px;
+    font-family:Consolas, monospace;
+    min-height:100vh;
+    color:#00ffff;
+
+    background:radial-gradient(circle at center,#050510 0%,#02020a 40%,#000000 100%);
+    overflow-x:hidden;
+}
+
+/* scanlines */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.03) 0px,
+        rgba(255,255,255,.03) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+    pointer-events:none;
+    animation:scan 8s linear infinite;
+}
+
+@keyframes scan{
+    from{background-position:0 0;}
+    to{background-position:0 400px;}
+}
+
+/* text glow (affects document text too) */
+body, p, div{
+    text-shadow:0 0 5px #00ffff,0 0 10px #00ffff,0 0 20px #0088ff;
+    letter-spacing:2px;
+}
+
+/* cursor */
+body::after{
+    content:"_";
+    animation:blink 1s infinite;
+    margin-left:6px;
+}
+@keyframes blink{
+    0%,50%,100%{opacity:1;}
+    25%,75%{opacity:0;}
+}
+
+/* screen area */
+#screen{
+    font-size:28px;
+    line-height:1.6;
+    white-space:pre-wrap;
+}
+
+/* ================= START BOXES ================= */
+.wrapper1{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:40px;
+}
+
+.box{
+    background:rgba(0,0,0,.6);
+    border:1px solid #00ffff;
+    border-radius:10px;
+    padding:25px;
+    text-align:center;
+    font-size:18px;
+    backdrop-filter:blur(6px);
+    animation:float 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes float{
+    from{transform:translateY(0);}
+    to{transform:translateY(-12px);}
+}
+
+/* ================= BUTTON ================= */
+button{
+    border:none;
+    background:black;
+    color:#00ffff;
+    padding:18px 35px;
+    font-size:18px;
+    border-radius:8px;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 0 10px #00ffff,inset 0 0 10px #00ffff;
+}
+
+/* animated border */
+button::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    border-radius:inherit;
+    background:linear-gradient(90deg,transparent,#00ffff,#ff00ff,#00ffff,transparent);
+    background-size:300% 100%;
+    animation:borderMove 3s linear infinite;
+    z-index:-1;
+}
+@keyframes borderMove{
+    from{background-position:0% 0;}
+    to{background-position:300% 0;}
+}
+
+button:hover{
+    color:black;
+    background:#00ffff;
+    box-shadow:0 0 25px #00ffff,0 0 60px #00ffff;
+}
+
+/* ================= SCORE ================= */
+#score{
+    margin-top:25px;
+    font-size:42px;
+    font-weight:bold;
+    text-transform:uppercase;
+    animation:rainbowText 4s linear infinite;
+}
+@keyframes rainbowText{
+    0%{color:#00ffff;text-shadow:0 0 10px #00ffff;}
+    25%{color:#ff00ff;text-shadow:0 0 10px #ff00ff;}
+    50%{color:#ffff00;text-shadow:0 0 10px #ffff00;}
+    75%{color:#00ff88;text-shadow:0 0 10px #00ff88;}
+    100%{color:#00ffff;text-shadow:0 0 10px #00ffff;}
+}
+
+/* win mode */
+.win{
+    font-size:70px;
+    text-align:center;
+    animation:winflash .6s infinite alternate;
+}
+@keyframes winflash{
+    from{filter:hue-rotate(0deg);}
+    to{filter:hue-rotate(360deg);}
+}
+/* center the continue button screen */
+/* put continue button in real screen center */
+#wrapper2{
+    position:fixed;
+    top:50%;
+    left:42%;
+    transform:translate(-50%,-50%);
+    z-index:10;
+    text-align:center;
+}
+
+/* remove spacing affecting centering */
+#wrapper2 br{
+    display:none;
+}
+
+
+</style>
 </head>
-<body>
-    <h1>hello i am viraj</h1>
+
+<body onload="startreal()">
+
+<div id="screen">
+
+    <div class="wrapper1">
+        <div class="box a">click</div>
+        <div class="box b">continue</div>
+        <div class="box c">to</div>
+        <div class="box d">begin.</div>
+    </div>
+
+    <div id="wrapper2">
+        <br>
+        <button onclick="start()">continue</button>
+    </div>
+
+    <button id="clickedbtn" onclick="clicking()">click</button>
+
+</div>
+
+<script>
+let score = 0;
+const screen = document.getElementById("screen");
+
+function startreal(){
+    document.getElementById("clickedbtn").style.display="none";
+}
+
+function start(){
+    document.getElementById("wrapper2").style.display="none";
+    screen.innerHTML="starting";
+    setTimeout(start2,600);
+}
+
+
+function start2(){
+    screen.innerHTML+=".";
+    setTimeout(start3,600);
+}
+function start3(){
+    screen.innerHTML+=".";
+    setTimeout(start4,600);
+}
+function start4(){
+    screen.innerHTML=
+        '<button id="clickedbtn" onclick="clicking()">click</button>'+
+        '<p id="score">score - 0</p>';
+}
+
+function clicking(){
+    score++;
+    document.getElementById("score").innerHTML="score - "+score;
+
+    if(score===100){
+        screen.innerHTML='<div class="win">YOU WIN</div>';
+    }
+}
+</script>
+
 </body>
 </html>
